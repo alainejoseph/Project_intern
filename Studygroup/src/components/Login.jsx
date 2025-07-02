@@ -29,7 +29,7 @@ const Login = () => {
   
 	  const handleError = (err) =>
     toast.error(err, {
-      position: "bottom-left",
+      position: "bottom-right",
     });
   const handleSuccess = (msg) =>
     toast.success(msg, {
@@ -64,18 +64,18 @@ function submitForm(e){
 
   return (
 	<Box sx={{justifyContent:'center',display:'flex'}}>
-		<div className={`${styles.wapper} ${styles.signUp}`}>
+		<div className={`${styles.signUp}`}>
 			
 			<div className={styles.form}>
 				<div className={styles.heading}>LOGIN</div>
-				<form>
+				<form method='post'>
 					<div>
-						<label htmlFor="name">Name</label>
-						<input type="text" id="name" name='email' placeholder="Enter your name" value={form.email} onChange={handleChange} />
+						<label htmlFor="email">Email</label>
+						<input type="email" id="email" name='email' placeholder="Enter your name" value={form.email} onChange={handleChange} />
 					</div>
 					<div>
-						<label htmlFor="e-mail">E-Mail</label>
-						<input type="email" id="e-mail" name='pass' placeholder="Enter you mail" value={form.pass} onChange={handleChange} />
+						<label htmlFor="pass">Password</label>
+						<input type="password" id="pass" name='pass' placeholder="Enter you password" value={form.pass} onChange={handleChange} />
 					</div>
 					<button type="submit" onClick={submitForm}>
 						Submit
@@ -85,7 +85,6 @@ function submitForm(e){
 					Don't have an account ? <Link to="/signup"> Sign Up </Link>
 				</p>
 			</div>
-			<ToastContainer/>
 		</div>
 	</Box>
 	);

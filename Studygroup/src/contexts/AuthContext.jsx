@@ -8,13 +8,13 @@ export const AuthProvider = ({ children }) => {
   })
 
   const [user, setUser] = useState(() => {
-    return JSON.parse(localStorage.getItem('userId')) || null
+    return JSON.parse(localStorage.getItem('user')) || null
   })
 
   // Sync to localStorage on change
   useEffect(() => {
     localStorage.setItem('isLoggedIn', isLoggedIn)
-    localStorage.setItem('userId', JSON.stringify(user) || '')
+    localStorage.setItem('user', JSON.stringify(user) || '')
     console.log("auth\n",user)
   }, [isLoggedIn, user])
 

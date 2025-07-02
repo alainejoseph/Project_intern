@@ -105,7 +105,6 @@ import { Box } from "@mui/material";
           Have an account ? <Link to="/login"> Login </Link>
         </p>
       </div>
-      <ToastContainer/>
     </div>
     </Box>
   );

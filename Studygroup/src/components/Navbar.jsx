@@ -53,14 +53,11 @@ const Logout = ()=>{
 }
 
 const loginButton = (
-  <>
-<Link to='/login'><Button key={'Login'} sx={{ color: '#fff' }}>
-                {'Login'}
-              </Button></Link>
+    <>
               <Link to='/signup'><Button key={'signup'} sx={{ color: '#fff' }}>
                 {'Signup'}
               </Button></Link>
-              </>
+    </>
 );
 
 
@@ -132,7 +129,6 @@ const userLogin = (
       <Box component="main" sx={{ p: 3 }}>
         <Toolbar />
       </Box>
-      <ToastContainer/>
     </Box>
   )
 }

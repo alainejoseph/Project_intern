@@ -86,7 +86,6 @@ const CreateGroup = () => {
           Submit
         </Button>
       </form>
-      <ToastContainer/>
     </div>
   )
 }

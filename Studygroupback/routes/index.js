@@ -15,8 +15,7 @@ router.post('/signup',async (req,res)=>{
 console.log(req.body)
 const newUser = new User(req.body)
 const saveUser = await newUser.save()
-
-console.log(saveUser)
+req.session.user = saveUser;
 res.status(201).json({ message: "User logged in successfully", success: true });
 })
 
@@ -24,7 +23,6 @@ res.status(201).json({ message: "User logged in successfully", success: true });
 router.post('/login', async (req, res) => {
   console.log(req.body)
   const user = await User.findOne({email:req.body.email})
-  console.log(user)
   // Simulate login logic
   if (user) {
     if(user.pass==req.body.pass){
@@ -59,14 +57,34 @@ router.post('/creategroup', async (req,res)=>{
   const group = {...req.body,createdAt: new Date().toLocaleString()}
   const newGroup = new Group(group)
   const save = newGroup.save()
-  console.log(newGroup)
   res.json({status:true})
 })
 
 router.get('/getgroups', async (req,res)=>{
   let groups = await Group.find()
-  console.log(groups);
   res.json({group:groups})
+})
+
+router.post('/joingroup/:id', async (req,res)=>{
+  try{
+  let group = await Group.findById(req.params.id)
+  group.members.push(req.body.user)
+  const saveGroup = await group.save()
+  res.json({status:true})
+  }catch(err){
+    console.log(err)
+    res.json({status:false})
+  }
+})
+
+router.get('/getgroup/:id', async (req,res)=>{
+  try{
+  let group = await Group.findById(req.params.id)
+
+  res.json({status:true,group})
+  }catch(err){
+    res.json({status:false})
+  }
 })
 
 router.get('/me', (req, res) => {

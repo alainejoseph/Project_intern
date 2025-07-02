@@ -12,7 +12,7 @@ export function getUser()
       .then(res => res.json())
       .then(data => setUser(data.user))
       .catch(() => setUser(null));
-   },[])
+   })
 
    return user;
 }
