@@ -1,125 +1,139 @@
+import React, { useState, useEffect, useContext } from "react";
 
-import React from 'react';
+import {io} from 'socket.io-client';
+const  socket = io('http://localhost:3000',{autoConnect:false})
+import {AuthContext} from '../../../contexts/AuthContext' 
+import {
+  Container, Box, TextField, Button, Typography, Paper, List, ListItem, ListItemText, Divider
+} from "@mui/material";
 
+function Messaging({group}) {
+  const {user} = useContext(AuthContext)
+  // const [username, setUsername] = useState("");
+  // const [room, setRoom] = useState("");
+  const [currentRoom, setCurrentRoom] = useState("");
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]);
 
-import { Avatar, Box , Divider, Fab, Grid, List, ListItem, ListItemIcon, ListItemText , Paper, TextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import { Send } from '@mui/icons-material';
+  const joinRoom = (username,room) => {
+    if (username && room) {
+      socket.emit("joinRoom", { username, room });
+      setCurrentRoom(room);
+      setMessages([]);
+    }
+  };
 
+  const leaveRoom = () => {
+    socket.emit("leaveRoom", currentRoom);
+    setCurrentRoom("");
+    setUsers([]);
+    setMessages([]);
+  };
 
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-  chatSection: {
-    width: '100%',
-    height: '80vh'
-  },
-  headBG: {
-      backgroundColor: '#e0e0e0'
-  },
-  borderRight500: {
-      borderRight: '1px solid #e0e0e0'
-  },
-  messageArea: {
-    height: '70vh',
-    overflowY: 'auto'
+  const sendMessage = () => {
+
+    if (message && currentRoom) {
+      
+      socket.emit("sendMessage", {
+        sender: user.name,
+        content: message,
+        room: currentRoom
+      });
+      setMessage("");
+    }
+  };
+
+  useEffect(() => {
+  socket.connect();
+  joinRoom(user.name,group._id)
+  
+  const handleHistory = (history) => setMessages(history);
+  const handleUsers = (users) => setUsers(users);
+
+  // Attach once
+
+  socket.on("chatHistory", handleHistory);
+  socket.on("roomUsers", handleUsers);
+
+  return () => {
+    // Clean up
+    socket.emit("leaveRoom", currentRoom);
+    socket.off("chatHistory", handleHistory);
+    socket.off("roomUsers", handleUsers);
+    socket.disconnect();
+    setCurrentRoom("");
+    setUsers([]);
+    setMessages([]);
+    console.log("Socket disconnected");
+  };
+}, [group._id,user.name]);
+
+useEffect(()=>{
+  const handleMessage = (msg) => {
+      console.log("Message received:", msg);
+      setMessages((prev) => [...prev, msg]);
+    };
+
+  socket.on("receiveMessage", handleMessage);
+
+  return ()=>{
+    socket.off("receiveMessage", handleMessage);
   }
-});
-
-const Messaging = () => {
-  const classes = useStyles();
+},[currentRoom])
 
   return (
-      <div>
-        <Grid container>
-            <Grid item xs={12} >
-                <Typography variant="h5" className="header-message">Chat</Typography>
-            </Grid>
-        </Grid>
-        <Grid container component={Paper} className={classes.chatSection}>
-            <Grid item xs={3} className={classes.borderRight500}>
-                <List>
-                    <ListItem button key="RemySharp">
-                        <ListItemIcon>
-                        <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="John Wick"></ListItemText>
-                    </ListItem>
-                </List>
-                <Divider />
-                <Grid item xs={12} style={{padding: '10px'}}>
-                    <TextField id="outlined-basic-email" label="Search" variant="outlined" fullWidth />
-                </Grid>
-                <Divider />
-                <List>
-                    <ListItem button key="RemySharp">
-                        <ListItemIcon>
-                            <Avatar alt="Remy Sharp" src="https://material-ui.com/static/images/avatar/1.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="Remy Sharp">Remy Sharp</ListItemText>
-                        <ListItemText secondary="online" align="right"></ListItemText>
-                    </ListItem>
-                    <ListItem button key="Alice">
-                        <ListItemIcon>
-                            <Avatar alt="Alice" src="https://material-ui.com/static/images/avatar/3.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="Alice">Alice</ListItemText>
-                    </ListItem>
-                    <ListItem button key="CindyBaker">
-                        <ListItemIcon>
-                            <Avatar alt="Cindy Baker" src="https://material-ui.com/static/images/avatar/2.jpg" />
-                        </ListItemIcon>
-                        <ListItemText primary="Cindy Baker">Cindy Baker</ListItemText>
-                    </ListItem>
-                </List>
-            </Grid>
-            <Grid item xs={9}>
-                <List className={classes.messageArea}>
-                    <ListItem key="1">
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <ListItemText align="right" primary="Hey man, What's up ?"></ListItemText>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <ListItemText align="right" secondary="09:30"></ListItemText>
-                            </Grid>
-                        </Grid>
-                    </ListItem>
-                    <ListItem key="2">
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <ListItemText align="left" primary="Hey, Iam Good! What about you ?"></ListItemText>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <ListItemText align="left" secondary="09:31"></ListItemText>
-                            </Grid>
-                        </Grid>
-                    </ListItem>
-                    <ListItem key="3">
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <ListItemText align="right" primary="Cool. i am good, let's catch up!"></ListItemText>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <ListItemText align="right" secondary="10:30"></ListItemText>
-                            </Grid>
-                        </Grid>
-                    </ListItem>
-                </List>
-                <Divider />
-                <Grid container style={{padding: '20px'}}>
-                    <Grid item xs={11}>
-                        <TextField id="outlined-basic-email" label="Type Something" fullWidth />
-                    </Grid>
-                    <Grid xs={1} align="right">
-                        <Fab color="primary" aria-label="add"><Send /></Fab>
-                    </Grid>
-                </Grid>
-            </Grid>
-        </Grid>
-      </div>
+    <Container maxWidth="md">
+      <Typography variant="h4" align="center" mt={4}>🔵 Real-Time Group Chat</Typography>
+
+      <Box mt={4} display="flex" gap={2}>
+      </Box>
+
+      {currentRoom && (
+        <Paper elevation={3} sx={{ mt: 4, p: 2 }}>
+          <Typography variant="h6">Room: {currentRoom}</Typography>
+          <Typography variant="subtitle1" color="textSecondary">Users:</Typography>
+          <List dense>
+            {users.map((user) => (
+              <ListItem key={user.id}>
+                <ListItemText primary={user.name} />
+              </ListItem>
+            ))}
+          </List>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box
+            sx={{
+              maxHeight: 300,
+              overflowY: "auto",
+              border: "1px solid #ddd",
+              p: 1,
+              mb: 2,
+              borderRadius: 1
+            }}
+          >
+            {messages.map((msg, idx) => (
+              <Box key={idx} mb={1}>
+                <Typography variant="body2"><strong>{msg.sender}:</strong> {msg.content}</Typography>
+              </Box>
+            ))}
+          </Box>
+
+          <Box display="flex" gap={1}>
+            <TextField
+              fullWidth
+              label="Type a message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            />
+            <Button variant="contained" onClick={sendMessage}>Send</Button>
+          </Box>
+        </Paper>
+      )}
+    </Container>
   );
 }
 
-export default Messaging;
+export default  Messaging;
