@@ -46,6 +46,7 @@ function Materials({ group }) {
           withCredentials: true,
         },
       );
+      console.log(resfiles.data.files);
       setFiles(resfiles.data.files);
     } catch (error) {
       setMessage("Upload failed");
@@ -69,8 +70,18 @@ function Materials({ group }) {
       >
         <List dense>
           {files.map((file) => (
-            <ListItem key={file}>
-              <ListItemText primary={file} />
+            <ListItem key={file.filename}>
+              <ListItemText
+                primary={
+                  <a
+                    href={`http://localhost:3000/download/${group._id}/${file.filename}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {file.originalName}
+                  </a>
+                }
+              />
             </ListItem>
           ))}
         </List>

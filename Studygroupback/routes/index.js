@@ -125,17 +125,46 @@ router.post("/uploadmaterial/:id", async (req, res) => {
 
 router.get("/getmaterials/:id", async (req, res) => {
   console.log(`req id : ${req.params.id}`);
-  var dirPath = path.join("public", "materials", req.params.id);
-  console.log(dirPath);
-  fs.readdir(dirPath, (err, files) => {
-    if (err) {
-      console.log("get Materials error \n", err);
-      res.status(400).json({ status: false });
-    } else {
-      console.log(files);
-      res.status(200).json({ files });
+  if (req.params.id != undefined) {
+    try {
+      const files = await fileSchema
+        .find({ groupId: req.params.id })
+        .select(["+originalName", "+filename"]);
+      console.log("get files : ", files);
+      res.json({ files });
+    } catch (err) {
+      console.log("get mat err \n", err);
+      res.status(500).json({ error: "Error fetching files" });
     }
-  });
+  }
+});
+
+router.get("/download/:groupId/:filename", async (req, res) => {
+  try {
+    if (req.params.filename != undefined && req.params.groupId != undefined) {
+      const file = await fileSchema.findOne({
+        filename: req.params.filename,
+        groupId: req.params.groupId,
+      });
+      if (!file) {
+        return res.status(404).send("File not found or access denied.");
+      }
+      const filePath = path.join(
+        "public",
+        "materials",
+        file.groupId,
+        file.filename,
+      );
+
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).send("File missing from server.");
+      }
+
+      res.download(filePath, file.originalName);
+    }
+  } catch (err) {
+    console.log("download err", err);
+  }
 });
 
 router.get("/getgroupusers/:id", async (req, res) => {
