@@ -17,6 +17,7 @@
     "@mui/styles": "^6.4.12",
     "axios": "^1.10.0",
     "bulma": "^1.0.4",
+    "promise": "^8.3.0",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
