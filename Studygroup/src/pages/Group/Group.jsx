@@ -11,6 +11,7 @@ import Container from "@mui/material/Container";
 import { useLocation } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Messaging from "./components/Messaging";
+import { toast } from "react-toastify";
 
 const Group = () => {
   const location = useLocation();
@@ -54,6 +55,29 @@ const Group = () => {
     setAnchorElUser(null);
   };
 
+  const leaveGroup = () => {
+    axios
+      .post(
+        `http://localhost:3000/leavegroup/${groupId}`,
+        { userId },
+        {
+          withCredentials: true,
+        },
+      )
+      .then((res) => {
+        toast.success(res.data.msg, {
+          position: "bottom-left",
+        });
+        handleCloseUserMenu();
+      })
+      .catch((err) => {
+        toast.error(err.data.msg, {
+          position: "bottom-left",
+        });
+        handleCloseUserMenu();
+      });
+  };
+
   return (
     <div>
       <Container maxWidth>
@@ -91,27 +115,13 @@ const Group = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem key={"Edit Group"} onClick={handleCloseUserMenu}>
-                <Button sx={{ textAlign: "center" }} variant="contained">
-                  Edit Group
-                </Button>
-              </MenuItem>
-              <MenuItem key={"Leave Group"} onClick={handleCloseUserMenu}>
+              <MenuItem key={"Leave Group"} onClick={leaveGroup}>
                 <Button
                   sx={{ textAlign: "center" }}
                   variant="outlined"
                   color="warning"
                 >
                   Leave Group{" "}
-                </Button>
-              </MenuItem>
-              <MenuItem key={"Delete Group"} onClick={handleCloseUserMenu}>
-                <Button
-                  sx={{ textAlign: "center" }}
-                  variant="outlined"
-                  color="error"
-                >
-                  Delete Group
                 </Button>
               </MenuItem>
             </Menu>
@@ -123,7 +133,7 @@ const Group = () => {
             <Typography variant="h6">{group.description}</Typography>
           </Box>
         </Card>
-        <Messaging group={group} />
+        {joined && <Messaging group={group} />}
       </Container>
     </div>
   );

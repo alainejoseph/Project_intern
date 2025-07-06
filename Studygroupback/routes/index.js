@@ -85,6 +85,28 @@ router.post("/joingroup/:id", async (req, res) => {
   }
 });
 
+router.post("/leavegroup/:id", (req, res) => {
+  console.log("leavegroup ", req.body.userId);
+  Group.findById(req.params.id)
+    .then((group) => {
+      group.members = group.members.filter((item) => item != req.body.userId);
+      console.log("members", group.members);
+      Group.updateOne(group)
+        .then((resdata) => {
+          console.log(resdata);
+          res.status(200).json({ status: true, msg: "you left the group" });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(400).json({ status: false, msg: "refresh and try again" });
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ status: false, msg: "refresh and try again" });
+    });
+});
+
 router.get("/getgroup/:id", async (req, res) => {
   try {
     let group = await Group.findById(req.params.id);

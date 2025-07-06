@@ -14,6 +14,7 @@ import Group from "./pages/Group/Group";
 import Profile from "./components/Profile";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import Admin from "./pages/admin/Admin";
+import AdminRoutes from "./utils/AdminRoutes";
 
 // const Login = lazy(()=>import('./components/Login'))
 
@@ -31,6 +32,8 @@ function App() {
               <Route path="/create-group" element={<CreateGroup />} />
               <Route path="/getgroup" element={<Group />} />
               <Route path="/profile" element={<Profile />} />
+            </Route>
+            <Route element={<AdminRoutes />}>
               <Route path="/admin" element={<Admin />} />
             </Route>
           </Routes>

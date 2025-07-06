@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const UserTable = () => {
+const GroupTable = () => {
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
   useEffect(() => {
@@ -78,12 +78,8 @@ const UserTable = () => {
                     <TableCell>{row.id}</TableCell>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.email}</TableCell>
-                    <TableCell>
-                      {row.isBlocked ? "Blocked" : "Not Blocked"}
-                    </TableCell>
-                    <TableCell>
-                      {row.isAdmin ? "is Admin" : "Not Admin"}
-                    </TableCell>
+                    <TableCell>{row.isBlocked}</TableCell>
+                    <TableCell>{row.isAdmin}</TableCell>
                     <TableCell>
                       <Button variant="contained" color="primary">
                         Details
@@ -121,4 +117,4 @@ const UserTable = () => {
   }
 };
 
-export default UserTable;
+export default GroupTable;

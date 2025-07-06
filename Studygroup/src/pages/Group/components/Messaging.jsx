@@ -134,7 +134,7 @@ function Messaging({ group }) {
         </Grid>
         <Grid size={4}>
           <Typography variant="h4" align="center" mt={2}>
-            Real-Time Group Chat
+            Group Chat
           </Typography>
           {currentRoom && (
             <Paper elevation={3} sx={{ mt: 4, p: 2 }}>
