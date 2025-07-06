@@ -10,7 +10,16 @@ const { getGroupUsers } = require("../helpers/groupHelpers");
 const fs = require("fs");
 
 /* GET home page. */
-router.post("/", auth.verifyUser);
+router.get("/", (req, res, next) => {
+  const user = req.session.user;
+  console.log("auth test \n", user);
+  if (!user) {
+    res.status(404).json({ status: false });
+  } else {
+    res.status(200).json({ user });
+    next();
+  }
+});
 
 router.post("/signup", async (req, res) => {
   console.log(req.body);
@@ -183,10 +192,25 @@ router.get("/getgroupusers/:id", async (req, res) => {
 
 router.get("/me", (req, res) => {
   if (req.session.user) {
+    console.log("me", req.session.user);
     res.json({ user: req.session.user });
   } else {
     res.status(401).json({ message: "Not logged in" });
   }
+});
+
+router.post("/profile", async (req, res) => {
+  console.log(req.body);
+  User.updateOne(req.body)
+    .then((resdata) => {
+      req.session.user = req.body;
+      console.log("updated", resdata);
+      res.status(200).json({ status: true });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ status: false });
+    });
 });
 
 router.post("/logout", (req, res) => {

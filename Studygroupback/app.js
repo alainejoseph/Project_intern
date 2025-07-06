@@ -1,6 +1,6 @@
 var express = require("express");
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
+var adminRouter = require("./routes/admin");
 const { createServer } = require("http");
 const connection = require("./connection");
 const cors = require("cors");
@@ -34,7 +34,7 @@ app.use(
     cookie: {
       secure: false, // true if using HTTPS
       httpOnly: true,
-      // 1 day
+      maxAge: 1 * 60 * 60 * 1000, // 1 day
     },
   }),
 );
@@ -45,7 +45,7 @@ app.use("/public", express.static(__dirname + "/public"));
 app.use(cookieParser());
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/admin", adminRouter);
 
 const Message = mongoose.model(
   "Message",

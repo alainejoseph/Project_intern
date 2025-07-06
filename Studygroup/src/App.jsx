@@ -12,6 +12,8 @@ import Home from "./pages/Home/Home";
 import { ToastContainer } from "react-toastify";
 import Group from "./pages/Group/Group";
 import Profile from "./components/Profile";
+import ProtectedRoutes from "./utils/ProtectedRoutes";
+import Admin from "./pages/admin/Admin";
 
 // const Login = lazy(()=>import('./components/Login'))
 
@@ -23,11 +25,14 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/create-group" element={<CreateGroup />} />
-            <Route path="/getgroup" element={<Group />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route element={<ProtectedRoutes />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/create-group" element={<CreateGroup />} />
+              <Route path="/getgroup" element={<Group />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/admin" element={<Admin />} />
+            </Route>
           </Routes>
           <ToastContainer />
         </AuthProvider>
