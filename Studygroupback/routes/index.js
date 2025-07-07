@@ -69,7 +69,7 @@ router.post("/creategroup", async (req, res) => {
 });
 
 router.get("/getgroups", async (req, res) => {
-  let groups = await Group.find();
+  let groups = await Group.find({ isApproved: { $ne: false } });
   res.json({ group: groups });
 });
 
@@ -91,7 +91,7 @@ router.post("/leavegroup/:id", (req, res) => {
     .then((group) => {
       group.members = group.members.filter((item) => item != req.body.userId);
       console.log("members", group.members);
-      Group.updateOne(group)
+      Group.findOneAndUpdate({ _id: group._id }, { members: group.members })
         .then((resdata) => {
           console.log(resdata);
           res.status(200).json({ status: true, msg: "you left the group" });

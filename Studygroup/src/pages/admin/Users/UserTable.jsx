@@ -13,17 +13,26 @@ import {
   Button,
 } from "@mui/material";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const UserTable = () => {
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/admin/getusers", { withCredentials: true })
-      .then((res) => {
-        console.log(res);
-        setData(res.data.users);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/admin/getusers", {
+        withCredentials: true,
       });
+      setData(res.data.users || []);
+    } catch (err) {
+      toast.error("Failed to fetch users");
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
   if (data != undefined) {
     const filteredData = data.filter((row) =>
@@ -31,6 +40,48 @@ const UserTable = () => {
         value.toString().toLowerCase().includes(searchText.toLowerCase()),
       ),
     );
+
+    function BlockUser(userId) {
+      axios
+        .post(
+          "http://localhost:3000/admin/blockuser",
+          { userId },
+          { withCredentials: true },
+        )
+        .then(() => {
+          fetchUsers();
+          toast.dark("User Blocked", {
+            position: "bottom-left",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Unable to Block user", {
+            position: "bottom-left",
+          });
+        });
+    }
+
+    function unBlockUser(userId) {
+      axios
+        .post(
+          "http://localhost:3000/admin/unblockuser",
+          { userId },
+          { withCredentials: true },
+        )
+        .then(() => {
+          fetchUsers();
+          toast.dark("User Unblocked", {
+            position: "bottom-left",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Unable to unblock user", {
+            position: "bottom-left",
+          });
+        });
+    }
 
     return (
       <Box sx={{ padding: 2 }}>
@@ -52,7 +103,7 @@ const UserTable = () => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <strong>ID</strong>
+                  <strong>Sno</strong>
                 </TableCell>
                 <TableCell>
                   <strong>Name</strong>
@@ -73,9 +124,9 @@ const UserTable = () => {
             </TableHead>
             <TableBody>
               {filteredData.length > 0 ? (
-                filteredData.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.id}</TableCell>
+                filteredData.map((row, index) => (
+                  <TableRow key={row._id}>
+                    <TableCell>{index + 1}</TableCell>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>
@@ -92,11 +143,23 @@ const UserTable = () => {
                         Send Email
                       </Button>
                       {!row.isBlocked ? (
-                        <Button variant="contained" color="warning">
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          onClick={() => {
+                            BlockUser(row._id);
+                          }}
+                        >
                           Block
                         </Button>
                       ) : (
-                        <Button variant="contained" color="warning">
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          onClick={() => {
+                            unBlockUser(row._id);
+                          }}
+                        >
                           Unblock
                         </Button>
                       )}

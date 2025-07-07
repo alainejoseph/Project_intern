@@ -18,7 +18,15 @@ const AdminRoutes = () => {
         setIsLoggedIn(false);
       });
   }, []);
-  return user.isAdmin ? <Outlet /> : <Navigate to="/" />;
+  return user ? (
+    user.isAdmin ? (
+      <Outlet />
+    ) : (
+      <Navigate to="/" />
+    )
+  ) : (
+    <Navigate to="/login" />
+  );
 };
 
 export default AdminRoutes;

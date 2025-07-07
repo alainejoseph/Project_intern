@@ -31,4 +31,76 @@ module.exports = adminHelpers = {
         });
     });
   },
+
+  getGroups: () => {
+    return new Promise((resolve, reject) => {
+      groupModel
+        .find()
+        .then((groups) => {
+          console.log(groups);
+          resolve(groups);
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        });
+    });
+  },
+
+  getUser: (userId) => {
+    return new Promise((resolve, reject) => {
+      userModel
+        .findById(userId)
+        .then((user) => {
+          console.log(user);
+          resolve(user);
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        });
+    });
+  },
+  blockuser: (userId) => {
+    return new Promise((resolve, reject) => {
+      userModel
+        .findOneAndUpdate({ _id: userId }, { isBlocked: true })
+        .then((resdata) => {
+          console.log(resdata);
+          resolve();
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        });
+    });
+  },
+  unBlockUser: (userId) => {
+    return new Promise((resolve, reject) => {
+      userModel
+        .findOneAndUpdate({ _id: userId }, { isBlocked: false })
+        .then((resdata) => {
+          console.log(resdata);
+          resolve();
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        });
+    });
+  },
+  approveGroup: (groupId) => {
+    return new Promise((resolve, reject) => {
+      groupModel
+        .findOneAndUpdate({ _id: groupId }, { isApproved: true })
+        .then((resdata) => {
+          console.log(resdata);
+          resolve();
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        });
+    });
+  },
 };

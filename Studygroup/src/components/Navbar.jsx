@@ -114,7 +114,7 @@ const Navbar = () => {
             component="div"
             sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
           >
-            MUI
+            StudyGroupFinder
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             <Link to="/">

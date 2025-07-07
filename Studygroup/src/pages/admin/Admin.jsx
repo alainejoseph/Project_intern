@@ -19,6 +19,7 @@ import Typography from "@mui/material/Typography";
 import TopCards from "./TopCards/TopCards";
 import { Grid } from "@mui/material";
 import UserTable from "./Users/UserTable.jsx";
+import GroupsTable from "./Groups/GroupsTable.jsx";
 
 const drawerWidth = 240;
 
@@ -50,7 +51,7 @@ function ResponsiveDrawer(props) {
       </Typography>
       <Divider />
       <List>
-        {["DashBoard", "Users", "Groups"].map((text, index) => (
+        {["DashBoard", "Users", "Groups"].map((text) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemText primary={text} />
@@ -142,7 +143,7 @@ function ResponsiveDrawer(props) {
           </Grid>
 
           <Grid item xs={12} xl={8}>
-            {/* <RevenueByCustomer /> */}
+            <GroupsTable />
           </Grid>
 
           <Grid item xs={12} xl={4}>
