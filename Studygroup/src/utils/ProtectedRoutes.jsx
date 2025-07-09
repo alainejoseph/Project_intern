@@ -2,6 +2,7 @@ import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
 import { Outlet, Navigate } from "react-router-dom";
 import { useContext, useEffect } from "react";
+import BlockedPage from "../components/BlockedPage";
 
 const ProtectedRoutes = () => {
   const { user, setUser, setIsLoggedIn } = useContext(AuthContext);
@@ -18,7 +19,15 @@ const ProtectedRoutes = () => {
         setIsLoggedIn(false);
       });
   }, []);
-  return user ? <Outlet /> : <Navigate to="/login" />;
+  return user ? (
+    user.isBlocked ? (
+      <BlockedPage />
+    ) : (
+      <Outlet />
+    )
+  ) : (
+    <Navigate to="/login" />
+  );
 };
 
 export default ProtectedRoutes;

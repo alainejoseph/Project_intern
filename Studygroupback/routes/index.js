@@ -4,6 +4,7 @@ const User = require("../Models/User");
 const Group = require("../Models/Group");
 const auth = require("../middleWare/authMid");
 const path = require("path");
+const bcrypt = require("bcrypt");
 const fileSchema = require("../Models/Files");
 const { createSecretToken } = require("../util/secretToken");
 const { getGroupUsers } = require("../helpers/groupHelpers");
@@ -22,28 +23,51 @@ router.get("/", (req, res, next) => {
 });
 
 router.post("/signup", async (req, res) => {
-  console.log(req.body);
-  const newUser = new User(req.body);
-  const saveUser = await newUser.save();
-  req.session.user = saveUser;
-  res
-    .status(201)
-    .json({ message: "User logged in successfully", success: true });
+  try {
+    console.log("Incoming body:", req.body);
+
+    const hashedPass = await bcrypt.hash(req.body.pass, 12);
+    req.body.pass = hashedPass;
+
+    console.log("Hashed body:", req.body);
+
+    const newUser = new User(req.body);
+    const saveUser = await newUser.save();
+
+    req.session.user = saveUser;
+
+    res.status(201).json({
+      message: "User signed up and logged in successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({
+      message: "Signup failed",
+      success: false,
+    });
+  }
 });
 
 router.post("/login", async (req, res) => {
-  console.log(req.body);
-  const user = await User.findOne({ email: req.body.email });
-  // Simulate login logic
-  if (user) {
-    if (user.pass == req.body.pass) {
-      req.session.user = user;
-      res.json({ message: "Logged in", user: user });
-    } else {
-      res.status(400).json({ message: "incorrect password" });
+  try {
+    console.log("Login request body:", req.body);
+
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
     }
-  } else {
-    res.status(400).json({ message: "Missing user" });
+
+    const isMatch = await bcrypt.compare(req.body.pass, user.pass);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
+
+    req.session.user = user; // set session only after password matches
+    res.json({ message: "Logged in successfully", user });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed", error: error.message });
   }
 });
 
